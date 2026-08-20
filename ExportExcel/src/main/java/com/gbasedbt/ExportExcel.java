@@ -18,10 +18,11 @@ public class ExportExcel {
 
     private static final Logger log = LoggerFactory.getLogger(ExportExcel.class);
     private static final String DIRVER_CLASSNAME = "com.gbasedbt.jdbc.Driver";
-    private static final String PROP = System.getProperty("prop","user");
-    private static final String SQL = System.getProperty("sql","select 1 from dual");
-    private static final String SQLFILE = System.getProperty("sqlfile","");
-    private static final String DBNAME = System.getProperty("db","testdb");
+    private static final String PROP = System.getProperty("PROP","user");
+    private static final String SQL = System.getProperty("SQL","select 1 from dual");
+    private static final String SQLFILE = System.getProperty("SQLFILE","");
+    private static final String DBNAME = System.getProperty("DBNAME","testdb");
+    private static final String OUTDIR = System.getProperty("OUTDIR","/tmp");
     private static final ResourceBundle bundle = ResourceBundle.getBundle(PROP);
 
     /**
@@ -82,22 +83,24 @@ public class ExportExcel {
         String ini_url        = getBundleString("url","jdbc:gbasedbt-sqli://127.0.0.1:9088/testdb:GBASEDBTSERVER=gbase01;DB_LOCALE=zh_CN.utf8;");
         String ini_user       = getBundleString("user","gbasedbt");
         String ini_pass       = getBundleString("pass","GBase123$%");
+        ini_url               = replaceGBase8sDbName(ini_url, DBNAME);
+        log.info("URL地址: " + ini_url);
 
+        String dir_name       = OUTDIR;
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-
         String os = System.getProperty("os.name").toLowerCase();
         String outfilename = "";
         if (os.contains("win")){
-            outfilename = "D:\\ExportExcel_win_";
+            if ("/tmp".equals(dir_name)){
+                dir_name = "D:\\";
+            }
+            outfilename = (dir_name.endsWith("\\")?dir_name:dir_name+"\\") + "ExportExcel_win_";
         } else {
-            outfilename = "/tmp/ExportExcel_lnx_";
+            outfilename = (dir_name.endsWith("/")?dir_name:dir_name+"/") + "ExportExcel_lnx_";
         }
         outfilename = outfilename + now.format(formatter) + ".xlsx";
         log.info("导出文件名: " + outfilename);
-
-        ini_url = replaceGBase8sDbName(ini_url, DBNAME);
-        log.info("URL地址: " + ini_url);
 
         String sql = "";
         if ("".equals(SQLFILE)){

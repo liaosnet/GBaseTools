@@ -31,9 +31,9 @@ public class DynamicExcelExporter {
         }
 
         // 2. 初始化 Writer
-        String tabName = metaData.getTableName(1);
+        String sheetname = "".equals(metaData.getTableName(1))?"多表关联":metaData.getTableName(1);
         ExcelWriter excelWriter = EasyExcel.write(out).build();
-        WriteSheet writeSheet = EasyExcel.writerSheet(tabName).head(head).build();
+        WriteSheet writeSheet = EasyExcel.writerSheet(sheetname).head(head).build();
 
         try {
             int batchSize = 1000;

@@ -9,7 +9,7 @@ EOF
   exit 1
 fi
 
-DBNAME=${DBNAME:-"testdb"}
+DBNAME=${1:-"testdb"}
 SQLSTR=$2
 
 if [ -s "${SQLSTR}" ]; then
@@ -20,6 +20,8 @@ if [ -s "${SQLSTR}" ]; then
 fi
 
 WORKDIR=$(cd $(dirname $0) && pwd)
+OUTDIR=/tmp
+PROP=user
 
 JDBCJAR=$(ls ${WORKDIR}/lib/gbasedbtjdbc*.jar 2>/dev/null)
 if [ x"${JDBCJAR}" = x ]; then
@@ -29,14 +31,20 @@ fi
 
 if [ ${FROMFILE:-0} -eq 0 ]; then
   java -Dfile.encoding=UTF-8 \
-    -Dsql="${SQLSTR}" \
+    -DPROP="${PROP:-user}" \
+    -DDBNAME="${DBNAME}" \
+    -DSQL="${SQLSTR}" \
+    -DOUTDIR="${OUTDIR}" \
     -cp ${WORKDIR}/conf/:${WORKDIR}/lib/* \
-    com.gbasedbt.ExportExcel
+    com.gbasedbt.POIExport
 else
   java -Dfile.encoding=UTF-8 \
-    -Dsqlfile="${SQLSTR}" \
+    -DPROP="${PROP:-user}" \
+    -DDBNAME="${DBNAME}" \
+    -DSQLFILE="${SQLSTR}" \
+    -DOUTDIR="${OUTDIR}" \
     -cp ${WORKDIR}/conf/:${WORKDIR}/lib/* \
-    com.gbasedbt.ExportExcel
+    com.gbasedbt.POIExport
 fi
 
 exit 0

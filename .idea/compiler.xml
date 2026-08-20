@@ -7,6 +7,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="ExportExcel" />
+        <module name="POIExport" />
         <module name="TestDbOpt" />
       </profile>
     </annotationProcessing>

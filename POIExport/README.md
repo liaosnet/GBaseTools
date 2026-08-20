@@ -1,4 +1,4 @@
-# ExportExcel  
+# POIExport  
 用于从数据库中导出结果，保存为excel文档  
 需要jre1.8或者以上运行环境  
 

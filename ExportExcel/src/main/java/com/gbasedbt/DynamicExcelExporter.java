@@ -11,6 +11,7 @@ import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Date;
 
 public class DynamicExcelExporter {
 
@@ -47,15 +48,13 @@ public class DynamicExcelExporter {
 
                     // 【核心修复】：拦截日期类型，手动格式化为字符串，
                     // 额外处理一下（实际上 instanceof Date 已经涵盖了 Timestamp）
-                    if (value instanceof Timestamp) {
-                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSS");
-                        value = sdf.format((Timestamp) value);
-                    } else if (value instanceof java.util.Date) {
-                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                        value = sdf.format((java.util.Date) value);
+                    if (value instanceof Date) {
+                        String dateType = metaData.getColumnTypeName(i);
+                        SimpleDateFormat sdf = new SimpleDateFormat(getFormat(dateType));
+                        value = sdf.format((Date) value);
                     }
 
-                    rowData.add(value);
+                    rowData.add((value != null)?value.toString():"");
                 }
                 dataList.add(rowData);
                 currentRow++;
@@ -75,5 +74,53 @@ public class DynamicExcelExporter {
             resultSet.close();
             statement.close();
         }
+    }
+
+    /**
+     * 将date/timestamp/datetime数据类型转换成对应的格式
+     * @param dt
+     * @return
+     */
+    private static String getFormat(String dt){
+        String fmt = null;
+        switch (dt.toLowerCase()) {
+            case "date":
+            case "datetime year to day":
+                fmt = "yyyy-MM-dd";
+                break;
+            case "datetime year to year":
+                fmt = "yyyy";
+                break;
+            case "datetime year to month":
+                fmt = "yyyy-MM";
+                break;
+            case "datetime year to hour":
+                fmt = "yyyy-MM-dd HH";
+                break;
+            case "datetime year to minute":
+                fmt = "yyyy-MM-dd HH:mm";
+                break;
+            case "datetime year to second":
+                fmt = "yyyy-MM-dd HH:mm:ss";
+                break;
+            case "datetime year to fraction(1)":
+                fmt = "yyyy-MM-dd HH:mm:ss.S";
+                break;
+            case "datetime year to fraction(2)":
+                fmt = "yyyy-MM-dd HH:mm:ss.SS";
+                break;
+            case "datetime year to fraction(3)":
+                fmt = "yyyy-MM-dd HH:mm:ss.SSS";
+                break;
+            case "datetime year to fraction(4)":
+                fmt = "yyyy-MM-dd HH:mm:ss.SSSS";
+                break;
+            case "datetime hour to second":
+                fmt = "HH:mm:ss";
+                break;
+            default:
+                fmt = "yyyy-MM-dd HH:mm:ss.SSSSS";
+        }
+        return fmt;
     }
 }

@@ -19,7 +19,7 @@ public class ExportExcel {
     private static final Logger log = LoggerFactory.getLogger(ExportExcel.class);
     private static final String DIRVER_CLASSNAME = "com.gbasedbt.jdbc.Driver";
     private static final String PROP = System.getProperty("PROP","user");
-    private static final String SQL = System.getProperty("SQL","select 1 from dual");
+    private static final String SQL = System.getProperty("SQL","select * from systables");
     private static final String SQLFILE = System.getProperty("SQLFILE","");
     private static final String DBNAME = System.getProperty("DBNAME","testdb");
     private static final String OUTDIR = System.getProperty("OUTDIR","/tmp");

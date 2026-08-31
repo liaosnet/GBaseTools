@@ -1,5 +1,6 @@
 # POIExport  
 用于从数据库中导出结果，保存为excel文档  
+或者从excel导入数据到库中  
 需要jre1.8或者以上运行环境  
 
 ## JDBC驱动  
@@ -11,7 +12,7 @@
 url, user, pass 用于数据库连接的url, user, pass常规参数，classsname固定为com.gbasedbt.jdbc.Driver  
 
 ## 运行  
-执行run.sh 库名 SQL文件路径|SQL语句  
+执行run.sh unload|load 库名 SQL文件路径|SQL语句|EXCEL文件 [表名]   
 
 注意：  
 建议使用 $'SQL语句' 的写法用于保留单引号内的特殊字符不处理，但 ' 本身应当使用 \' 替换，或者使用双引号。  
@@ -19,12 +20,16 @@ url, user, pass 用于数据库连接的url, user, pass常规参数，classsname
 示例：  
 1，执行SQL文件  
 ```text
-bash run.sh testdb 1.sql  
+# 执行sql并导出excel
+bash run.sh unload testdb 1.sql  
+
+# 从excel中读取数据并写入数据库testdb.testtab  
+bash run.sh load testdb 1.xlsx testtab 
 ```
 
 2，执行SQL  
 ```text
-bash run.sh testdb $'select `tabid`,`tabname` from `systables` where `tabname` like \'sys%\';'
+bash run.sh unload testdb $'select `tabid`,`tabname` from `systables` where `tabname` like \'sys%\';'
 ```
 
 结果存放于/tmp目录下，文件名：/tmp/ExportExcel_系统类型_日期时间到秒.xlsx  

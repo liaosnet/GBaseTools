@@ -1,22 +1,28 @@
 #!/bin/bash
 
-if [ $# -ne 2 ]; then
+if [ $# -lt 3 ] || [ $# -gt 4 ]; then
   cat <<EOF
 
-  run.sh DBNAME SQL
+  run.sh unload DBNAME SQL|SQLFILE
+         load   DBNAME excelfile [tabname]
 
 EOF
   exit 1
 fi
 
-DBNAME=${1:-"testdb"}
-SQLSTR=$2
-
-if [ -s "${SQLSTR}" ]; then
-  FROMFILE=1
-  if [ ! x"${SQLSTR:0:1}" = x"/" ]; then
-    SQLSTR=$(pwd)/${SQLSTR}
+DBNAME=${2:-"testdb"}
+OPTTYPE=${1:-"unload"}
+if [ x"${OPTTYPE}" = "xunload" ]; then
+  SQLSTR=$3
+  if [ -s "${SQLSTR}" ]; then
+    FROMFILE=1
+    if [ ! x"${SQLSTR:0:1}" = x"/" ]; then
+      SQLSTR=$(pwd)/${SQLSTR}
+    fi
   fi
+else
+  EXCELFILE=$3
+  TABNAME=$4
 fi
 
 WORKDIR=$(cd $(dirname $0) && pwd)
@@ -29,22 +35,32 @@ if [ x"${JDBCJAR}" = x ]; then
   exit 1
 fi
 
-if [ ${FROMFILE:-0} -eq 0 ]; then
-  java -Dfile.encoding=UTF-8 \
-    -DPROP="${PROP:-user}" \
-    -DDBNAME="${DBNAME}" \
-    -DSQL="${SQLSTR}" \
-    -DOUTDIR="${OUTDIR}" \
-    -cp ${WORKDIR}/conf/:${WORKDIR}/lib/* \
-    com.gbasedbt.POIExport
+if [ x"${OPTTYPE}" = "xunload" ]; then
+  if [ ${FROMFILE:-0} -eq 0 ]; then
+    java -Dfile.encoding=UTF-8 \
+      -DPROP="${PROP:-user}" \
+      -DDBNAME="${DBNAME}" \
+      -DSQL="${SQLSTR}" \
+      -DOUTDIR="${OUTDIR}" \
+      -cp ${WORKDIR}/conf/:${WORKDIR}/lib/* \
+      com.gbasedbt.POIExport
+  else
+    java -Dfile.encoding=UTF-8 \
+      -DPROP="${PROP:-user}" \
+      -DDBNAME="${DBNAME}" \
+      -DSQLFILE="${SQLSTR}" \
+      -DOUTDIR="${OUTDIR}" \
+      -cp ${WORKDIR}/conf/:${WORKDIR}/lib/* \
+      com.gbasedbt.POIExport
+  fi
 else
   java -Dfile.encoding=UTF-8 \
     -DPROP="${PROP:-user}" \
     -DDBNAME="${DBNAME}" \
-    -DSQLFILE="${SQLSTR}" \
-    -DOUTDIR="${OUTDIR}" \
+    -DTABNAME="${TABNAME}" \
+    -DEXCELFILE="${EXCELFILE}" \
     -cp ${WORKDIR}/conf/:${WORKDIR}/lib/* \
-    com.gbasedbt.POIExport
+    com.gbasedbt.POIImport
 fi
 
 exit 0

@@ -80,12 +80,20 @@ public class SaxExcelImportUtil {
 
     private static long batchInsert(Connection connection, String tableName,
                                     RowCollector collector) throws Exception {
+        boolean isMysqlMode = connection.getMetaData().getURL().toLowerCase().contains("sqlmode=mysql");
+
         List<String> headers = collector.getHeaders();
         List<List<String>> dataRows = collector.getDataRows();
 
         if (headers.isEmpty() || dataRows.isEmpty()) return 0;
 
-        String cols = String.join(",", headers);
+        String cols = "";
+        if (isMysqlMode){
+            cols = "`" + String.join("`,`", headers) + "`";
+            tableName = "`" + tableName + "`";
+        } else {
+            cols = String.join(",", headers);
+        }
         String placeholders = headers.stream().map(h -> "?")
                 .reduce((a, b) -> a + "," + b).orElse("");
         String sql = "INSERT INTO " + tableName + " (" + cols + ") VALUES (" + placeholders + ")";
@@ -115,7 +123,10 @@ public class SaxExcelImportUtil {
             connection.commit();
 
         } catch (Exception e) {
-            connection.rollback();
+            // 可能prepare时就报错了，需要处理一下
+            if (! connection.getAutoCommit()){
+                connection.rollback();
+            }
             throw new RuntimeException("表[" + tableName + "] 批量插入失败: " + e.getMessage(), e);
         } finally {
             connection.setAutoCommit(originalAutoCommit);

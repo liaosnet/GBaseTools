@@ -1,6 +1,6 @@
 # POIExport  
-用于从数据库中导出结果，保存为excel文档  
-或者从excel导入数据到库中  
+用于从数据库中导出结果，保存为excel或者csv文档  
+或者从excel或csv导入数据到库中  
 需要jre1.8或者以上运行环境  
 
 ## JDBC驱动  
@@ -9,10 +9,13 @@
 注意：按实际版本替换lib目录下的`gbasedbtjdbc*.jar`文件  
 
 ## user.properties配置文件  
-url, user, pass 用于数据库连接的url, user, pass常规参数，classsname固定为com.gbasedbt.jdbc.Driver  
+url, user, pass 用于数据库连接的url, user, pass常规参数，classsname固定为`com.gbasedbt.jdbc.Driver`  
 
 ## 运行  
-执行run.sh unload|load 库名 SQL文件路径|SQL语句|EXCEL文件 [表名]   
+### 导出  
+执行`run.sh unload 类型(xlsx|csv) 库名 SQL文件路径|SQL语句`  
+### 导入  
+执行`run.sh load 库名 输入文件名 [表名]`  
 
 注意：  
 建议使用 $'SQL语句' 的写法用于保留单引号内的特殊字符不处理，但 ' 本身应当使用 \' 替换，或者使用双引号。  
@@ -21,7 +24,7 @@ url, user, pass 用于数据库连接的url, user, pass常规参数，classsname
 1，执行SQL文件  
 ```text
 # 执行sql并导出excel
-bash run.sh unload testdb 1.sql  
+bash run.sh unload xlsx testdb 1.sql  
 
 # 从excel中读取数据并写入数据库testdb.testtab  
 bash run.sh load testdb 1.xlsx testtab 
@@ -29,7 +32,7 @@ bash run.sh load testdb 1.xlsx testtab
 
 2，执行SQL  
 ```text
-bash run.sh unload testdb $'select `tabid`,`tabname` from `systables` where `tabname` like \'sys%\';'
+bash run.sh unload csv testdb $'select `tabid`,`tabname` from `systables` where `tabname` like \'sys%\';'
 ```
 
-结果存放于/tmp目录下，文件名：/tmp/ExportExcel_系统类型_日期时间到秒.xlsx  
+结果存放于OUTDIR（默认是/tmp，可修改run.sh脚本指定不同目录）目录下，文件名：/tmp/ExportExcel_系统类型_日期时间到秒.[xlsx|csv]  

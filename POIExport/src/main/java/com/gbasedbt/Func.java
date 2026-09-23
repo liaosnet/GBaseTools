@@ -14,7 +14,7 @@ import java.util.ResourceBundle;
 
 public class Func {
 
-    private static final Logger log = LoggerFactory.getLogger(POIImport.class);
+    private static final Logger log = LoggerFactory.getLogger(Func.class);
     private static final String DIRVER_CLASSNAME = "com.gbasedbt.jdbc.Driver";
     private static final String PROP = System.getProperty("PROP","user");
     private static final String DBNAME = System.getProperty("DBNAME","testdb");
@@ -123,6 +123,12 @@ public class Func {
         // 正则: 匹配 jdbc:gbasedbt-sqli: + 可选的主机端口 + / + 数据库名 + 后缀
         String regex = "(jdbc:gbasedbt-sqli:)(//[^/]+)?(/)[^:]+(:.*)";
         return originalUrl.replaceFirst(regex, "$1$2$3" + newDbName + "$4");
+    }
+
+    public static boolean supportMysqlMode(Connection connection){
+        boolean supportMysql = false;
+
+        return supportMysql;
     }
 
     /**

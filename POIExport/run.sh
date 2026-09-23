@@ -3,17 +3,18 @@
 if [ $# -lt 3 ] || [ $# -gt 4 ]; then
   cat <<EOF
 
-  run.sh unload DBNAME SQL|SQLFILE
-         load   DBNAME excelfile [tabname]
+  run.sh unload TYPE   DBNAME    SQL|SQLFILE
+         load   DBNAME fileName [tabName]
 
 EOF
   exit 1
 fi
 
-DBNAME=${2:-"testdb"}
 OPTTYPE=${1:-"unload"}
-if [ x"${OPTTYPE}" = "xunload" ]; then
-  SQLSTR=$3
+if [ x"${OPTTYPE}" = x"unload" ]; then
+  FILETYPE=${2:-"xlsx"}
+  DBNAME=${3:-"testdb"}
+  SQLSTR=$4
   if [ -s "${SQLSTR}" ]; then
     FROMFILE=1
     if [ ! x"${SQLSTR:0:1}" = x"/" ]; then
@@ -21,6 +22,7 @@ if [ x"${OPTTYPE}" = "xunload" ]; then
     fi
   fi
 else
+  DBNAME=${2:-"testdb"}
   EXCELFILE=$3
   TABNAME=$4
 fi
@@ -42,6 +44,7 @@ if [ x"${OPTTYPE}" = "xunload" ]; then
       -DDBNAME="${DBNAME}" \
       -DSQL="${SQLSTR}" \
       -DOUTDIR="${OUTDIR}" \
+      -DOUTTYPE="${FILETYPE}" \
       -cp ${WORKDIR}/conf/:${WORKDIR}/lib/* \
       com.gbasedbt.POIExport
   else
@@ -50,6 +53,7 @@ if [ x"${OPTTYPE}" = "xunload" ]; then
       -DDBNAME="${DBNAME}" \
       -DSQLFILE="${SQLSTR}" \
       -DOUTDIR="${OUTDIR}" \
+      -DOUTTYPE="${FILETYPE}" \
       -cp ${WORKDIR}/conf/:${WORKDIR}/lib/* \
       com.gbasedbt.POIExport
   fi

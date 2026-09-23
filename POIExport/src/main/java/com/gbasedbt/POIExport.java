@@ -16,6 +16,7 @@ public class POIExport {
     private static final String SQL = System.getProperty("SQL","select * from systables");
     private static final String SQLFILE = System.getProperty("SQLFILE","");
     private static final String OUTDIR = System.getProperty("OUTDIR","/tmp");
+    private static final String OUTTYPE = System.getProperty("OUTTYPE","xlsx");
 
     public static void main(String[] args) throws Exception {
 
@@ -32,7 +33,11 @@ public class POIExport {
         } else {
             outfilename = (dir_name.endsWith("/")?dir_name:dir_name+"/") + "POIExport_lnx_";
         }
-        outfilename = outfilename + now.format(formatter) + ".xlsx";
+        if ("csv".equalsIgnoreCase(OUTTYPE)){
+            outfilename = outfilename + now.format(formatter) + ".csv";
+        } else {
+            outfilename = outfilename + now.format(formatter) + ".xlsx";
+        }
         log.info("导出文件名: " + outfilename);
 
         String sql = "";
@@ -46,9 +51,12 @@ public class POIExport {
 
         try (Connection conn = getConn();
             FileOutputStream fos = new FileOutputStream(outfilename)) {
-
-            PoiExcelExportUtil.export(conn, sql, fos);
-            log.info("Excel 导出成功！");
+            if ("csv".equalsIgnoreCase(OUTTYPE)){
+                CsvExportUtil.exportSql(conn, sql, fos);
+            } else {
+                PoiExcelExportUtil.export(conn, sql, fos);
+            }
+            log.info("文件：" + outfilename + " 导出成功！");
         }
     }
 }

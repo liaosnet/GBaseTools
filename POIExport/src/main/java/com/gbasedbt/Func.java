@@ -125,6 +125,11 @@ public class Func {
         return originalUrl.replaceFirst(regex, "$1$2$3" + newDbName + "$4");
     }
 
+    /**
+     * TODO: 获取数据库版本，判断是否支持mysql模式。
+     * @param connection
+     * @return
+     */
     public static boolean supportMysqlMode(Connection connection){
         boolean supportMysql = false;
 

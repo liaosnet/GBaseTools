@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.gbasedbt.Mybatis3OutCursor.InterfaceMainMapper">
+
+    <!--
+        游标动态结果集映射：
+        业务过程返回的列不固定，这里自动把每一行映射为 Map（列名->值）
+    -->
+    <resultMap id="commListResult" type="java.util.LinkedHashMap" autoMapping="true"/>
+
+    <!--
+        调用入口存储过程 INTERFACE_MAIN
+        与 pro.sql 中过程的参数对应关系：
+            pi_procna  -> #{procna}   IN   存储过程名称（需带包名，如 pkg_xx.proc_name）
+            pi_indata  -> #{indata}   IN   输入数据包 格式 key1=value1|key2=value2
+            po_outdata -> #{outdata}  OUT  输出数据包，格式同输入包
+            po_result  -> #{listnm}   OUT  游标结果集
+            po_retcod  -> #{retCode}  OUT  返回码 0:失败 1:成功
+            po_params  -> #{retParas} OUT  错误信息or参数
+
+        说明：
+        1. OUT 参数的值在调用结束后会被写回到传入的 Map 中，
+           游标结果通过 params.get("listnm") 获取。
+        2. 游标 OUT 参数使用 typeHandler 且不写 jdbcType，
+           由 InformixCursorTypeHandler 通过驱动特有方法注册游标，
+           需要 GBase 定制版 MyBatis 支持（标准版会报
+           "The JDBC Type must be specified for output parameter"）。
+    -->
+    <select id="interface_main" resultType="java.util.Map" statementType="CALLABLE">
+        { call interface_main(
+            #{procna, mode=IN, javaType=java.lang.String, jdbcType=VARCHAR},
+            #{indata, mode=IN, javaType=java.lang.String, jdbcType=CLOB},
+            #{outdata, mode=OUT, javaType=java.lang.String, jdbcType=VARCHAR},
+
+            <!-- 游标输出：使用 typeHandler，去掉 jdbcType -->
+            <!-- typeHandler使用自定义的GBaseCursorTypeHandler -->
+            #{listnm, mode=OUT,
+              javaType=java.sql.ResultSet,
+              resultMap=commListResult,
+              typeHandler=com.gbasedbt.Mybatis3OutCursor.GBaseCursorTypeHandler},
+
+            #{retCode, mode=OUT, javaType=java.lang.String, jdbcType=VARCHAR},
+            #{retParas, mode=OUT, javaType=java.lang.String, jdbcType=VARCHAR}
+        ) }
+    </select>
+
+</mapper>

@@ -11,5 +11,31 @@
 
     <artifactId>Mybatis3OutCursor</artifactId>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+            <version>3.5.16</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.gbasedbt</groupId>
+            <artifactId>jdbc</artifactId>
+            <version>3.6.3.32</version>
+        </dependency>
+    </dependencies>
 
 </project>

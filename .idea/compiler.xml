@@ -7,9 +7,14 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="ExportExcel" />
+        <module name="Mybatis3OutCursor" />
         <module name="POIExport" />
         <module name="TestDbOpt" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="MybatisCursorType" target="8" />
+      <module name="OutCursorType" target="8" />
+    </bytecodeTargetLevel>
   </component>
 </project>

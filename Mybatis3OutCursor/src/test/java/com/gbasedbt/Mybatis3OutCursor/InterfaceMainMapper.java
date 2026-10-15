@@ -1,4 +1,4 @@
-package com.demo.mapper;
+package com.gbasedbt.Mybatis3OutCursor;
 
 import java.util.List;
 import java.util.Map;

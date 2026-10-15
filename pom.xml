@@ -12,6 +12,7 @@
         <module>TestDbOpt</module>
         <module>ExportExcel</module>
         <module>POIExport</module>
+        <module>Mybatis3OutCursor</module>
     </modules>
 
     <build>

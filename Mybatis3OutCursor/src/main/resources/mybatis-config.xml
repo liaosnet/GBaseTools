@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+    <!-- 数据库连接属性 -->
+    <properties resource="db.properties"></properties>
+
+    <settings>
+        <!-- 打印执行的 SQL 日志 -->
+        <setting name="logImpl" value="STDOUT_LOGGING" />
+    </settings>
+
+    <!--
+        游标 OUT 参数注册拦截器：
+        代替标准 CallableStatementHandler 的 OUT 参数注册逻辑，
+        使游标参数能通过驱动的 IfxRegisterOutParameter(i, IFX_TYPE_CURSOR) 注册
+        （标准注册方式 GBase 驱动会报 "不明确的 java.sql.Type"）。
+    -->
+    <plugins>
+        <plugin interceptor="com.gbasedbt.Mybatis3OutCursor.GBaseCursorOutParameterInterceptor"/>
+    </plugins>
+
+    <!-- 环境配置 -->
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="driver" value="${driver}"/>
+                <property name="url" value="${url}"/>
+                <property name="username" value="${username}"/>
+                <property name="password" value="${password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+    <!-- 映射文件 -->
+    <mappers>
+        <mapper resource="mappers/InterfaceMainMapper.xml"/>
+    </mappers>
+
+</configuration>

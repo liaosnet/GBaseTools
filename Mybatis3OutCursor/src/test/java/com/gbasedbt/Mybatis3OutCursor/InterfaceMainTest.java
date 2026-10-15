@@ -1,11 +1,11 @@
-package com.demo;
+package com.gbasedbt.Mybatis3OutCursor;
 
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.demo.mapper.InterfaceMainMapper;
+import com.gbasedbt.Mybatis3OutCursor.InterfaceMainMapper;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;

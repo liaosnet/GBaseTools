@@ -1,4 +1,4 @@
-package com.demo.handler;
+package com.gbasedbt.Mybatis3OutCursor;
 
 import com.gbasedbt.jdbc.IfxCallableStatement;
 import com.gbasedbt.lang.IfxTypes;
@@ -10,24 +10,22 @@ import org.apache.ibatis.type.JdbcType;
 import java.sql.*;
 
 /**
- * 解决 GBase 8s / Informix 存储过程游标 OUT 参数报错：
+ * 解决 GBase 8s 存储过程游标 OUT 参数报错：
  * "不明确的 java.sql.Type，请使用 IfxRegisterOutParameter()"
  *
  * 说明：
  * 1. 标准版 MyBatis 3.5.x 的 TypeHandler/BaseTypeHandler 没有
  *    registerOutParameter 方法，因此下面的 registerOutParameter 不是覆写，
  *    由 GBaseCursorOutParameterInterceptor 在 parameterize 阶段调用。
- *    若使用 GBase 定制版 MyBatis（TypeHandler 自带 registerOutParameter
+ *    若使用 GBase 8s 定制版 MyBatis（TypeHandler 自带 registerOutParameter
  *    钩子），此方法签名完全一致，可加回 @Override 并去掉拦截器。
  * 2. GBase 8s 驱动使用 com.gbasedbt.jdbc / com.gbasedbt.lang 包；
- *    若使用 IBM Informix 驱动（ifxjdbc），import 替换为
- *    com.informix.jdbc.IfxCallableStatement / com.informix.lang.IfxTypes 即可。
  */
-public class InformixCursorTypeHandler extends BaseTypeHandler<ResultSet> {
+public class GBaseCursorTypeHandler extends BaseTypeHandler<ResultSet> {
 
     @Override
     public void setNonNullParameter(PreparedStatement ps, int i, ResultSet parameter, JdbcType jdbcType) throws SQLException {
-        throw new UnsupportedOperationException("InformixCursorTypeHandler 仅用于处理 OUT 游标参数");
+        throw new UnsupportedOperationException("GBaseCursorTypeHandler 仅用于处理 OUT 游标参数");
     }
 
     /**
@@ -79,7 +77,7 @@ public class InformixCursorTypeHandler extends BaseTypeHandler<ResultSet> {
             ifxCs.IfxRegisterOutParameter(parameterIndex, IfxTypes.IFX_TYPE_CURSOR);
         } else {
             // 兼容非 GBase环境
-            cs.registerOutParameter(parameterIndex, java.sql.Types.OTHER);
+            cs.registerOutParameter(parameterIndex, Types.OTHER);
         }
     }
 

@@ -1,12 +1,10 @@
-package com.demo.plugin;
+package com.gbasedbt.Mybatis3OutCursor;
 
 import java.sql.CallableStatement;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Properties;
 
-import com.demo.handler.InformixCursorTypeHandler;
-import com.gbasedbt.jdbc.IfxCallableStatement;
 import org.apache.ibatis.executor.ExecutorException;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
@@ -26,19 +24,16 @@ import org.apache.ibatis.plugin.Signature;
  *   1. 强制要求参数上有 jdbcType（游标参数不写 jdbcType 会报
  *      "The JDBC Type must be specified for output parameter"）；
  *   2. 只能调用标准的 cs.registerOutParameter(i, jdbcType.TYPE_CODE)，
- *      而 GBase/Informix 驱动对游标 OUT 参数会报
- *      "不明确的 java.sql.Type，请使用 IfxRegisterOutParameter()"。
+ *      而 GBase 8s驱动对游标 OUT 参数会报 "不明确的 java.sql.Type，请使用 IfxRegisterOutParameter()"。
  *
  * 本拦截器拦截 StatementHandler.parameterize：
  *   - 非存储过程调用：直接走标准逻辑；
  *   - 存储过程调用：代替标准注册逻辑，游标 OUT 参数交给
- *     InformixCursorTypeHandler.registerOutParameter（内部使用驱动特有方法
- *     IfxRegisterOutParameter(i, IFX_TYPE_CURSOR)），其余 OUT/INOUT 参数
- *     仍按标准逻辑注册，随后设置 IN/INOUT 参数值。
+ *     GBaseCursorTypeHandler.registerOutParameter（内部使用驱动特有方法 IfxRegisterOutParameter(i, IFX_TYPE_CURSOR)），
+ *     其余 OUT/INOUT 参数 仍按标准逻辑注册，随后设置 IN/INOUT 参数值。
  *
- * 若项目中使用的是 GBase 定制版 MyBatis（TypeHandler 自带
- * registerOutParameter 钩子），可去掉本拦截器及 mybatis-config.xml 中的
- * plugins 配置。
+ * 若项目中使用的是 GBase 8s 定制版 MyBatis（TypeHandler 自带 registerOutParameter 钩子），
+ * 可去掉本拦截器及 mybatis-config.xml 中的plugins 配置。
  */
 @Intercepts(@Signature(type = StatementHandler.class, method = "parameterize", args = {Statement.class}))
 public class GBaseCursorOutParameterInterceptor implements Interceptor {
@@ -62,9 +57,9 @@ public class GBaseCursorOutParameterInterceptor implements Interceptor {
             ParameterMapping parameterMapping = parameterMappings.get(i);
             if (parameterMapping.getMode() == ParameterMode.OUT
                     || parameterMapping.getMode() == ParameterMode.INOUT) {
-                if (parameterMapping.getTypeHandler() instanceof InformixCursorTypeHandler) {
+                if (parameterMapping.getTypeHandler() instanceof GBaseCursorTypeHandler) {
                     // 游标 OUT 参数：IfxRegisterOutParameter(i, IFX_TYPE_CURSOR)
-                    ((InformixCursorTypeHandler) parameterMapping.getTypeHandler())
+                    ((GBaseCursorTypeHandler) parameterMapping.getTypeHandler())
                             .registerOutParameter(cs, i + 1, parameterMapping.getJdbcType());
                 } else if (parameterMapping.getJdbcType() != null) {
                     cs.registerOutParameter(i + 1, parameterMapping.getJdbcType().TYPE_CODE);
